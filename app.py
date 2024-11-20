@@ -21,8 +21,15 @@ DB_CONFIG = {
 # Configurar SES Client
 SES_REGION = os.getenv("SES_REGION")  # Altere para sua região do SES
 SES_SENDER_EMAIL = os.getenv("SES_SENDER_EMAIL")  # E-mail verificado no SES
+AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
-ses_client = boto3.client("ses", region_name=SES_REGION)
+ses_client = boto3.client(
+    "ses",
+    region_name=SES_REGION,
+    aws_access_key_id=AWS_ACCESS_KEY,
+    aws_secret_access_key=AWS_SECRET_KEY,
+)
 
 
 def get_db_connection():
@@ -75,7 +82,13 @@ def subscribe():
 
         return jsonify({"message": "Email cadastrado com sucesso!"}), 201
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/", methods=["GET"])
+def hello():
+    return jsonify({"message": "Newsletter Subs"})
 
 
 @app.route("/emails", methods=["GET"])
@@ -90,8 +103,9 @@ def get_emails():
         print(emails)
         return jsonify({"emails": emails}), 200
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3000)
+    app.run(host="0.0.0.0", port=8500)
